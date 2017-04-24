@@ -246,7 +246,7 @@ class SkatSva:
 
 ####################################################
 # pipeline start
-if full==1:
+if full==0:
 
 	# extract individuals with phenotypes
 	print("cat "+staticid+"."+phe+" | grep -v fid | awk '{print $2}' > "+staticid+".keep")
@@ -259,7 +259,7 @@ if full==1:
 	print("zcat "+id+".vcf.gz | ./getsites.py | bgzip -c > "+id+".sites.vcf.gz")
 	print(tabix+" "+id+".sites.vcf.gz")
 
-#if full==1:
+
 	### VCF to PLINK
 	print(plink+" --vcf "+id+".vcf.gz --make-bed --out out."+id+" --const-fid 0")
 	# transpose 
