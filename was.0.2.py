@@ -4,10 +4,10 @@ import os
 import re
 
 full=0
-id0='qe866'
+id0='qe864'
 id='qe864'
 staticid=id.upper()
-phe='pheno.js.sob.20121216.txt'
+phe='pheno.txt'
 kgp='./ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz'
 exac='./ExAC.r0.3.1.sites.vep.vcf.gz'
 ensembl='GRCh37.75'
