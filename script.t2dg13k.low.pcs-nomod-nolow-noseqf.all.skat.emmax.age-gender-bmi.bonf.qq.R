@@ -1,0 +1,26 @@
+library(SKAT);
+sessionInfo();
+q.bed<-"./ft2dg13k.low.pcs-nomod-nolow-noseqf.all.bed";
+q.bim<-"./ft2dg13k.low.pcs-nomod-nolow-noseqf.all.bim";
+q.fam<-"./ft2dg13k.low.pcs-nomod-nolow-noseqf.all.fam";
+q.setid<-"./ft2dg13k.low.pcs-nomod-nolow-noseqf.all.setid";
+q.ssd<-"./ft2dg13k.low.pcs-nomod-nolow-noseqf.all.ssd";
+q.info<-"./ft2dg13k.low.pcs-nomod-nolow-noseqf.all.info";
+q.cov<-"./t2dg13k.all.pheno.pca.txt";
+kf<-"./t2dg13k.all.BN.kinf";
+fam_cov<-Read_Plink_FAM_Cov(q.fam,q.cov,Is.binary=FALSE,cov_header=TRUE);
+y<-fam_cov$Phenotype;
+Generate_SSD_SetID(q.bed,q.bim,q.fam,q.setid,q.ssd,q.info);
+ssd.info<-Open_SSD(q.ssd,q.info);
+obj<-SKAT_NULL_emmaX(y ~ fam_cov$age + fam_cov$bmi + fam_cov$gender,Kin.File=kf);
+out_cov<-SKAT.SSD.All(ssd.info,obj);
+t<-out_cov$results;
+t<-t[with(t,order(P.value)),];
+d<-dim(t)[1];
+t$rank<-seq(1,d);
+t$bonf<-0.05/d;
+t$bonf.sig<-t$P.value<t$bonf;
+fn<-"ft2dg13k.low.pcs-nomod-nolow-noseqf.all.skat.emmax.age-gender-bmi.bonf.OUT.txt";
+write.table(t,file=fn,sep="\t",quote=F,row.names=F,col.names=T);
+fastqq2 <- function(pvals, ...) { np <- length(pvals); thin.idx <- 1:np; thin.logp.exp <- -log10(thin.idx/(np+1)); thin.logp.obs <- -log10(pvals[order(pvals)[thin.idx]]); plot(thin.logp.exp, thin.logp.obs, xlab=expression(-log[10](p[expected])), ylab=expression(-log[10](p[observed])),  main="all.skat.emmax.low.pcs-nomod-nolow-noseqf",...); abline(0, 1, col='gray', lty=2); thin.idx <- c((0.9)^(5:1), thin.idx); logp.cint.95 <- -log10(qbeta(0.95, thin.idx, np - thin.idx + 1)); logp.cint.05 <- -log10(qbeta(0.05, thin.idx, np - thin.idx + 1)); thin.logp.exp <- -log10(thin.idx/(np+1)); lines(thin.logp.exp, logp.cint.95, lty=2, col='red'); lines(thin.logp.exp, logp.cint.05, lty=2, col='red'); }
+l <- 1; fastqq2(pchisq(qchisq(t$P.value,1)/l,1)); mt<-0.05/length(t$P.value); abline(h=-log10(mt), lty=3); png(paste(fn,'QQ','png',sep='.')); fastqq2(pchisq(qchisq(t$P.value,1)/l,1)); dev.off();
